@@ -13,6 +13,7 @@ interface PlaidAccount {
   institutionId: string | null
   institutionName: string | null
   itemId: string
+  itemStatus: string
   plaidItemId: number
   createdAt: string
   updatedAt: string
@@ -21,17 +22,27 @@ interface PlaidAccount {
 interface InstitutionGroup {
   name: string
   itemId: string
+  status: string
   accounts: PlaidAccount[]
 }
 
 const accounts = ref<PlaidAccount[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
+const checkingStatus = ref(false)
 
 // Disconnect state
 const disconnectingItemId = ref<string | null>(null)
 const disconnectInstitutionName = ref('')
 const disconnectLoading = ref(false)
+
+// Re-auth state
+const reauthItemId = ref<string | null>(null)
+const { openUpdateLink, loading: plaidLoading } = usePlaidLink(async () => {
+  // On successful re-auth, refresh accounts
+  reauthItemId.value = null
+  await fetchAccounts()
+})
 
 async function fetchAccounts() {
   loading.value = true
@@ -47,6 +58,29 @@ async function fetchAccounts() {
   }
 }
 
+async function checkItemStatuses() {
+  // Get unique item IDs from accounts
+  const itemIds = [...new Set(accounts.value.map(a => a.itemId))]
+  if (itemIds.length === 0) return
+
+  checkingStatus.value = true
+  try {
+    await Promise.allSettled(
+      itemIds.map(itemId =>
+        $fetch(`/api/plaid/items/${itemId}/status`)
+      )
+    )
+    // Re-fetch accounts to get updated statuses
+    accounts.value = await $fetch<PlaidAccount[]>('/api/plaid/accounts')
+  }
+  catch {
+    // Status check failures are non-blocking
+  }
+  finally {
+    checkingStatus.value = false
+  }
+}
+
 async function refresh() {
   await fetchAccounts()
 }
@@ -54,17 +88,18 @@ async function refresh() {
 defineExpose({ refresh })
 
 const groupedAccounts = computed<InstitutionGroup[]>(() => {
-  const groups = new Map<string, { itemId: string; accounts: PlaidAccount[] }>()
+  const groups = new Map<string, { itemId: string; status: string; accounts: PlaidAccount[] }>()
   for (const account of accounts.value) {
     const key = account.institutionName || 'Unknown Institution'
     if (!groups.has(key)) {
-      groups.set(key, { itemId: account.itemId, accounts: [] })
+      groups.set(key, { itemId: account.itemId, status: account.itemStatus || 'healthy', accounts: [] })
     }
     groups.get(key)!.accounts.push(account)
   }
   return Array.from(groups.entries()).map(([name, group]) => ({
     name,
     itemId: group.itemId,
+    status: group.status,
     accounts: group.accounts,
   }))
 })
@@ -92,6 +127,11 @@ async function handleDisconnect() {
   }
 }
 
+async function handleReauth(itemId: string) {
+  reauthItemId.value = itemId
+  await openUpdateLink(itemId)
+}
+
 function badgeColor(type: string): 'success' | 'info' | 'warning' | 'neutral' {
   switch (type) {
     case 'depository': return 'success'
@@ -108,8 +148,12 @@ function accountTypeLabel(type: string, subtype: string | null): string {
   return type.charAt(0).toUpperCase() + type.slice(1)
 }
 
-onMounted(() => {
-  fetchAccounts()
+onMounted(async () => {
+  await fetchAccounts()
+  // Lazy-poll item statuses after initial load
+  if (accounts.value.length > 0) {
+    checkItemStatuses()
+  }
 })
 </script>
 
@@ -133,12 +177,20 @@ onMounted(() => {
     </div>
 
     <div v-else class="space-y-6">
+      <div v-if="checkingStatus" class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+        <UIcon name="i-lucide-loader-2" class="w-4 h-4 animate-spin" />
+        Checking connection status...
+      </div>
+
       <UCard v-for="group in groupedAccounts" :key="group.name">
         <template #header>
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <UIcon name="i-lucide-building-2" class="w-5 h-5 text-gray-500" />
               <span class="font-semibold text-gray-900 dark:text-white">{{ group.name }}</span>
+              <UBadge v-if="group.status === 'degraded'" color="warning" variant="subtle" size="xs">
+                Needs attention
+              </UBadge>
             </div>
             <UButton
               variant="ghost"
@@ -151,37 +203,46 @@ onMounted(() => {
           </div>
         </template>
 
-        <div class="divide-y divide-gray-200 dark:divide-gray-700">
-          <div
-            v-for="account in group.accounts"
-            :key="account.accountId"
-            class="flex items-center justify-between py-3 first:pt-0 last:pb-0"
-          >
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2">
-                <span class="font-medium text-gray-900 dark:text-white truncate">{{ account.name }}</span>
-                <UBadge :color="badgeColor(account.type)" variant="subtle" size="xs">
-                  {{ accountTypeLabel(account.type, account.subtype) }}
-                </UBadge>
-              </div>
-              <p
-                v-if="account.officialName && account.officialName !== account.name"
-                class="text-sm text-gray-500 dark:text-gray-400 truncate"
-              >
-                {{ account.officialName }}
-              </p>
-              <p v-if="account.mask" class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                ****{{ account.mask }}
-              </p>
-            </div>
+        <div class="space-y-4">
+          <PlaidReauthBanner
+            v-if="group.status === 'degraded'"
+            :institution-name="group.name"
+            :loading="plaidLoading && reauthItemId === group.itemId"
+            @reauth="handleReauth(group.itemId)"
+          />
 
-            <div v-if="account.currentBalance" class="text-right ml-4">
-              <span class="font-semibold text-gray-900 dark:text-white">
-                {{ formatAmount(account.currentBalance) }}
-              </span>
-              <p v-if="account.availableBalance && account.availableBalance !== account.currentBalance" class="text-xs text-gray-500 dark:text-gray-400">
-                {{ formatAmount(account.availableBalance) }} available
-              </p>
+          <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            <div
+              v-for="account in group.accounts"
+              :key="account.accountId"
+              class="flex items-center justify-between py-3 first:pt-0 last:pb-0"
+            >
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-medium text-gray-900 dark:text-white truncate">{{ account.name }}</span>
+                  <UBadge :color="badgeColor(account.type)" variant="subtle" size="xs">
+                    {{ accountTypeLabel(account.type, account.subtype) }}
+                  </UBadge>
+                </div>
+                <p
+                  v-if="account.officialName && account.officialName !== account.name"
+                  class="text-sm text-gray-500 dark:text-gray-400 truncate"
+                >
+                  {{ account.officialName }}
+                </p>
+                <p v-if="account.mask" class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                  ****{{ account.mask }}
+                </p>
+              </div>
+
+              <div v-if="account.currentBalance" class="text-right ml-4">
+                <span class="font-semibold text-gray-900 dark:text-white">
+                  {{ formatAmount(account.currentBalance) }}
+                </span>
+                <p v-if="account.availableBalance && account.availableBalance !== account.currentBalance" class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ formatAmount(account.availableBalance) }} available
+                </p>
+              </div>
             </div>
           </div>
         </div>
