@@ -39,6 +39,14 @@ export function validateTransactionForm(data: { type: string; amount: string; de
   return errors
 }
 
+// Keep in sync with server/utils/validation.ts
+export function validateNotes(notes: string | undefined | null): { field: string; message: string } | null {
+  if (notes && notes.length > 2000) {
+    return { field: 'notes', message: 'Notes must be 2000 characters or less' }
+  }
+  return null
+}
+
 export function validatePassword(password: string): { valid: boolean; message?: string } {
   if (password.length < 8) {
     return { valid: false, message: 'Password must be at least 8 characters' }

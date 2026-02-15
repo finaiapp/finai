@@ -59,9 +59,11 @@ export async function seedDefaultCategories(userId: number) {
   const existing = await getUserCategories(userId)
   if (existing.length > 0) return existing
 
+  // Use onConflictDoNothing to handle race conditions when
+  // concurrent requests both attempt to seed for the same user
   await db.insert(categories).values(
     DEFAULT_CATEGORIES.map(c => ({ ...c, userId })),
-  )
+  ).onConflictDoNothing()
 
   return getUserCategories(userId)
 }

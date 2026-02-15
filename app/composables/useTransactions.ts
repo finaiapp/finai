@@ -35,13 +35,15 @@ export function useTransactions() {
   const transactions = ref<Transaction[]>([])
   const total = ref(0)
   const loading = ref(false)
+  const error = ref<string | null>(null)
 
   async function fetchTransactions(filters: TransactionFilters = {}) {
     loading.value = true
+    error.value = null
     try {
       const params = new URLSearchParams()
       if (filters.type) params.set('type', filters.type)
-      if (filters.categoryId) params.set('categoryId', String(filters.categoryId))
+      if (filters.categoryId !== undefined) params.set('categoryId', String(filters.categoryId))
       if (filters.startDate) params.set('startDate', filters.startDate)
       if (filters.endDate) params.set('endDate', filters.endDate)
       if (filters.limit) params.set('limit', String(filters.limit))
@@ -51,6 +53,9 @@ export function useTransactions() {
       const data = await $fetch<TransactionsResponse>(`/api/transactions${query ? `?${query}` : ''}`)
       transactions.value = data.items
       total.value = data.total
+    }
+    catch (err: any) {
+      error.value = extractErrorMessage(err)
     }
     finally {
       loading.value = false
@@ -88,5 +93,5 @@ export function useTransactions() {
     total.value = Math.max(0, total.value - 1)
   }
 
-  return { transactions, total, loading, fetchTransactions, addTransaction, editTransaction, removeTransaction }
+  return { transactions, total, loading, error, fetchTransactions, addTransaction, editTransaction, removeTransaction }
 }

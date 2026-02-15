@@ -62,5 +62,9 @@ export function validateTransaction(data: Record<string, any>): { valid: boolean
     return { valid: false, message: 'Invalid date' }
   }
 
+  if (data.notes && data.notes.length > 2000) {
+    return { valid: false, message: 'Notes must be 2000 characters or less' }
+  }
+
   return { valid: true }
 }

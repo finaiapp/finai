@@ -2,14 +2,13 @@
 defineProps<{
   open: boolean
   description?: string
+  loading?: boolean
 }>()
 
 const emit = defineEmits<{
   confirm: []
   cancel: []
 }>()
-
-const loading = ref(false)
 </script>
 
 <template>
@@ -26,7 +25,7 @@ const loading = ref(false)
 
     <template #footer>
       <div class="flex justify-end gap-2">
-        <UButton variant="ghost" label="Cancel" @click="emit('cancel')" />
+        <UButton variant="ghost" label="Cancel" :disabled="loading" @click="emit('cancel')" />
         <UButton color="error" label="Delete" :loading="loading" @click="emit('confirm')" />
       </div>
     </template>

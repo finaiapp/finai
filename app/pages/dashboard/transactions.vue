@@ -14,6 +14,7 @@ const { categories, fetchCategories } = useCategories()
 const showAddModal = ref(false)
 const showEditModal = ref(false)
 const showDeleteModal = ref(false)
+const deleteLoading = ref(false)
 const editingTransaction = ref<typeof transactions.value[0] | null>(null)
 const deletingTransaction = ref<typeof transactions.value[0] | null>(null)
 
@@ -74,10 +75,16 @@ function openDelete(transaction: typeof transactions.value[0]) {
 
 async function onConfirmDelete() {
   if (!deletingTransaction.value) return
-  await removeTransaction(deletingTransaction.value.id)
-  showDeleteModal.value = false
-  deletingTransaction.value = null
-  await loadData()
+  deleteLoading.value = true
+  try {
+    await removeTransaction(deletingTransaction.value.id)
+    showDeleteModal.value = false
+    deletingTransaction.value = null
+    await loadData()
+  }
+  finally {
+    deleteLoading.value = false
+  }
 }
 
 onMounted(async () => {
@@ -147,6 +154,7 @@ watch(page, loadData)
     <TransactionsTransactionDeleteConfirm
       :open="showDeleteModal"
       :description="deletingTransaction?.description"
+      :loading="deleteLoading"
       @confirm="onConfirmDelete"
       @cancel="showDeleteModal = false"
     />

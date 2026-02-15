@@ -26,7 +26,7 @@ const categoryOptions = computed(() => [
 function emitFilters() {
   emit('filter-change', {
     type: type.value || undefined,
-    categoryId: categoryId.value || undefined,
+    categoryId: categoryId.value !== undefined ? categoryId.value : undefined,
     startDate: startDate.value || undefined,
     endDate: endDate.value || undefined,
   })
