@@ -119,6 +119,65 @@ export function usePlaidLink(onSuccessCallback?: () => void | Promise<void>) {
     }
   }
 
+  async function openUpdateLink(itemId: string) {
+    loading.value = true
+    error.value = null
+    success.value = false
+
+    try {
+      // 1. Fetch a link token in update mode (with item_id)
+      const { link_token } = await $fetch<{ link_token: string }>('/api/plaid/link-token', {
+        method: 'POST',
+        body: { item_id: itemId },
+      })
+
+      // 2. Wait for the CDN script to be loaded
+      await $plaidLinkReady
+
+      if (!window.Plaid) {
+        throw new Error('Plaid Link failed to load')
+      }
+
+      // 3. Create the Plaid Link handler in update mode
+      handler = window.Plaid.create({
+        token: link_token,
+        onSuccess: async () => {
+          // Update mode does NOT return a public_token to exchange.
+          // Mark the item as healthy after successful re-authentication.
+          try {
+            await $fetch(`/api/plaid/items/${itemId}/status`, {
+              method: 'PATCH',
+              body: { status: 'healthy' },
+            })
+            success.value = true
+            if (onSuccessCallback) {
+              await onSuccessCallback()
+            }
+          }
+          catch (err: unknown) {
+            error.value = handleApiError(err)
+          }
+          finally {
+            loading.value = false
+          }
+        },
+        onExit: (err: PlaidLinkError | null) => {
+          if (err) {
+            error.value = err.display_message || 'Re-authentication cancelled'
+          }
+          loading.value = false
+        },
+      })
+
+      // 4. Open the Plaid Link UI in update mode
+      handler.open()
+    }
+    catch (err: unknown) {
+      error.value = handleApiError(err)
+      loading.value = false
+    }
+  }
+
   // Clean up handler on component unmount
   onUnmounted(() => {
     if (handler) {
@@ -127,5 +186,5 @@ export function usePlaidLink(onSuccessCallback?: () => void | Promise<void>) {
     }
   })
 
-  return { openLink, loading, error, success }
+  return { openLink, openUpdateLink, loading, error, success }
 }
