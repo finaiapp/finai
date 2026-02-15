@@ -15,6 +15,13 @@
       "when": 1771155956684,
       "tag": "0001_warm_yellowjacket",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1771172495048,
+      "tag": "0002_wakeful_daredevil",
+      "breakpoints": true
     }
   ]
 }
