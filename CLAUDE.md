@@ -1,7 +1,54 @@
-# Project Guidelines
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+finai is a personal financial dashboard built with Nuxt 4, Vue 3, and Nuxt UI. It uses Bun as the package manager and runtime.
+
+## Commands
+
+- **Dev server:** `bun run dev` (runs on port 3889)
+- **Build:** `bun run build`
+- **Preview production build:** `bun run preview`
+- **E2E tests (all):** `bun run test:e2e`
+- **E2E tests (single file):** `bunx playwright test tests/example.spec.ts`
+- **E2E tests (UI mode):** `bun run test:e2e:ui`
+- **Install deps:** `bun install`
+- **Prepare Nuxt types:** `bun run postinstall`
+
+## Architecture
+
+- **Nuxt 4** with `app/` directory structure (not the legacy root-level layout)
+- **UI:** Nuxt UI (`@nuxt/ui`) which provides components and Tailwind CSS styling
+- **Testing:** Playwright with `@nuxt/test-utils/playwright` integration — tests live in `tests/` and import from `@nuxt/test-utils/playwright` (not bare `@playwright/test`)
+- **Entry point:** `app/app.vue` uses `<NuxtLayout>` + `<NuxtPage>` for routing
+
+### Directory Structure
+
+```
+app/                  # Nuxt 4 source directory
+  app.vue             # Root component (layout + page wiring)
+  pages/              # File-based routing
+  components/         # Auto-imported Vue components
+  composables/        # Auto-imported composables (useState, useFetch wrappers, etc.)
+  layouts/            # Layout components (default.vue)
+  assets/css/         # Global styles, Tailwind customizations
+  middleware/         # Route middleware
+  plugins/            # Nuxt plugins
+server/               # Nitro server directory
+  api/                # API routes (server/api/foo.ts → /api/foo)
+  middleware/         # Server middleware
+  utils/              # Server-only utilities
+tests/                # Playwright E2E tests
+```
+
+## Nuxt Modules
+
+Configured in `nuxt.config.ts`: `@nuxt/test-utils`, `@nuxt/ui`, `@nuxtjs/ngrok`, `@oro.ad/nuxt-claude-devtools`
 
 <!-- NUXT-DEVTOOLS:CRITICAL-FILES -->
-## ⚠️ Critical Configuration Files
+## Critical Configuration Files
 
 The following files trigger a full Nuxt restart when modified:
 - `nuxt.config.ts`
@@ -11,7 +58,7 @@ The following files trigger a full Nuxt restart when modified:
 - `.nuxtrc`
 - `tsconfig.json`
 
-### 🔴 MANDATORY CHECK (EVERY TIME, NO EXCEPTIONS)
+### MANDATORY CHECK (EVERY TIME, NO EXCEPTIONS)
 
 **BEFORE modifying ANY of these files, you MUST:**
 
@@ -38,15 +85,6 @@ The following files trigger a full Nuxt restart when modified:
 3. **Check settings file** (read `.claude-devtools/settings.json`)
 
 4. **Act based on autoConfirm setting**
-
-### Example: Adding i18n locale
-
-```
-Step 1: Create locales/es.json           ✓ prerequisite
-Step 2: Read .claude-devtools/settings.json  ✓ check flag
-Step 3: If autoConfirm=false → ask user
-Step 4: Update nuxt.config.ts            ✓ only after confirmation
-```
 
 ### Current Setting
 
