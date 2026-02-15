@@ -72,7 +72,8 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
       notes: event.data.notes || undefined,
     })
   }
-  finally {
+  catch (err: any) {
+    error.value = extractErrorMessage(err)
     loading.value = false
   }
 }
@@ -114,7 +115,7 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
       </UFormField>
 
       <div class="flex justify-end gap-2">
-        <UButton variant="ghost" label="Cancel" @click="emit('cancel')" />
+        <UButton variant="ghost" label="Cancel" :disabled="loading" @click="emit('cancel')" />
         <UButton type="submit" :loading="loading" :label="transaction ? 'Update' : 'Add Transaction'" />
       </div>
     </UForm>
