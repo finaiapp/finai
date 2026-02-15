@@ -8,8 +8,10 @@ useSeoMeta({
   title: 'Transactions - finai',
 })
 
-const { transactions, total, loading, fetchTransactions, addTransaction, editTransaction, removeTransaction } = useTransactions()
-const { categories, fetchCategories } = useCategories()
+const { transactions, total, loading, error: txError, fetchTransactions, addTransaction, editTransaction, removeTransaction } = useTransactions()
+const { categories, error: catError, fetchCategories } = useCategories()
+
+const pageError = computed(() => txError.value || catError.value)
 
 const showAddModal = ref(false)
 const showEditModal = ref(false)
@@ -107,6 +109,14 @@ watch(page, loadData)
       :categories="categories"
       class="mb-6"
       @filter-change="onFilterChange"
+    />
+
+    <UAlert
+      v-if="pageError"
+      color="error"
+      :title="pageError"
+      icon="i-lucide-alert-circle"
+      class="mb-4"
     />
 
     <TransactionsTransactionList

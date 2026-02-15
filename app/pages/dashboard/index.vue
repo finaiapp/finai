@@ -8,8 +8,10 @@ useSeoMeta({
   title: 'Dashboard - finai',
 })
 
-const { summary, loading, fetchSummary } = useDashboardSummary()
-const { transactions, fetchTransactions } = useTransactions()
+const { summary, loading, error: summaryError, fetchSummary } = useDashboardSummary()
+const { transactions, error: txError, fetchTransactions } = useTransactions()
+
+const pageError = computed(() => summaryError.value || txError.value)
 
 onMounted(async () => {
   await Promise.all([
@@ -51,6 +53,14 @@ const cards = computed(() => [
     <div v-if="loading" class="flex justify-center py-8">
       <UIcon name="i-lucide-loader-2" class="w-6 h-6 animate-spin text-gray-400" />
     </div>
+
+    <UAlert
+      v-if="pageError"
+      color="error"
+      :title="pageError"
+      icon="i-lucide-alert-circle"
+      class="mb-6"
+    />
 
     <template v-else>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
