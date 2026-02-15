@@ -21,7 +21,8 @@ test.describe('Login Page', () => {
   test('has link to register page', async ({ page, goto }) => {
     await goto('/login', { waitUntil: 'hydration' })
 
-    const link = page.getByRole('link', { name: 'Get started' })
+    const main = page.getByRole('main')
+    const link = main.getByRole('link', { name: 'Get started', exact: true })
     await expect(link).toBeVisible()
     await expect(link).toHaveAttribute('href', '/register')
   })
@@ -29,8 +30,9 @@ test.describe('Login Page', () => {
   test('has OAuth buttons for GitHub and Google', async ({ page, goto }) => {
     await goto('/login', { waitUntil: 'hydration' })
 
-    const githubButton = page.getByRole('link', { name: 'GitHub' })
-    const googleButton = page.getByRole('link', { name: 'Google' })
+    const main = page.getByRole('main')
+    const githubButton = main.getByRole('link', { name: 'GitHub' })
+    const googleButton = main.getByRole('link', { name: 'Google' })
 
     await expect(githubButton).toBeVisible()
     await expect(googleButton).toBeVisible()
@@ -62,7 +64,8 @@ test.describe('Register Page', () => {
   test('has link to login page', async ({ page, goto }) => {
     await goto('/register', { waitUntil: 'hydration' })
 
-    const link = page.getByRole('link', { name: 'Sign in' })
+    const main = page.getByRole('main')
+    const link = main.getByRole('link', { name: 'Sign in', exact: true })
     await expect(link).toBeVisible()
     await expect(link).toHaveAttribute('href', '/login')
   })
