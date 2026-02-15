@@ -17,7 +17,7 @@ export function useCategories() {
       categories.value = await $fetch<Category[]>('/api/categories')
     }
     catch (err: any) {
-      error.value = extractErrorMessage(err)
+      error.value = handleApiError(err)
     }
     finally {
       loading.value = false

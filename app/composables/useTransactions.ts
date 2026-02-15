@@ -55,7 +55,7 @@ export function useTransactions() {
       total.value = data.total
     }
     catch (err: any) {
-      error.value = extractErrorMessage(err)
+      error.value = handleApiError(err)
     }
     finally {
       loading.value = false

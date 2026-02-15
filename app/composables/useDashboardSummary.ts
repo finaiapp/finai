@@ -16,7 +16,7 @@ export function useDashboardSummary() {
       summary.value = await $fetch<DashboardSummary>('/api/dashboard/summary')
     }
     catch (err: any) {
-      error.value = extractErrorMessage(err)
+      error.value = handleApiError(err)
     }
     finally {
       loading.value = false
