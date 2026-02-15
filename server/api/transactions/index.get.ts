@@ -21,13 +21,27 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'endDate must be in YYYY-MM-DD format' })
   }
 
+  // Validate numeric params
+  const categoryId = query.categoryId ? Number(query.categoryId) : undefined
+  if (query.categoryId && (isNaN(categoryId!) || categoryId! < 0)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid categoryId' })
+  }
+  const limit = query.limit ? Number(query.limit) : 50
+  if (query.limit && (isNaN(limit) || limit < 1)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid limit' })
+  }
+  const offset = query.offset ? Number(query.offset) : 0
+  if (query.offset && (isNaN(offset) || offset < 0)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid offset' })
+  }
+
   const filters = {
     type: type as 'income' | 'expense' | undefined,
-    categoryId: query.categoryId ? Number(query.categoryId) : undefined,
+    categoryId,
     startDate,
     endDate,
-    limit: query.limit ? Math.min(Number(query.limit), 100) : 50,
-    offset: query.offset ? Number(query.offset) : 0,
+    limit: Math.min(limit, 100),
+    offset,
   }
 
   return getUserTransactions(session.user.id, filters)

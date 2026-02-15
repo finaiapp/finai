@@ -73,3 +73,46 @@ test.describe('Dashboard API - Auth Protection', () => {
     expect(res.status()).toBe(401)
   })
 })
+
+test.describe('Transactions API - Input Validation', () => {
+  test('POST /api/transactions rejects empty body', async ({ page }) => {
+    const res = await page.request.post('/api/transactions', { data: {} })
+    expect(res.status()).toBe(401)
+  })
+
+  test('GET /api/transactions rejects invalid type filter', async ({ page }) => {
+    const res = await page.request.get('/api/transactions?type=invalid')
+    expect(res.status()).toBe(401)
+  })
+
+  test('GET /api/transactions rejects invalid date format', async ({ page }) => {
+    const res = await page.request.get('/api/transactions?startDate=not-a-date')
+    expect(res.status()).toBe(401)
+  })
+
+  test('PUT /api/transactions/999 returns 401 without session', async ({ page }) => {
+    const res = await page.request.put('/api/transactions/999', {
+      data: { description: 'Updated' },
+    })
+    expect(res.status()).toBe(401)
+  })
+
+  test('DELETE /api/transactions/999 returns 401 without session', async ({ page }) => {
+    const res = await page.request.delete('/api/transactions/999')
+    expect(res.status()).toBe(401)
+  })
+})
+
+test.describe('Categories API - Input Validation', () => {
+  test('POST /api/categories rejects empty body', async ({ page }) => {
+    const res = await page.request.post('/api/categories', { data: {} })
+    expect(res.status()).toBe(401)
+  })
+
+  test('PUT /api/categories/999 returns 401 without session', async ({ page }) => {
+    const res = await page.request.put('/api/categories/999', {
+      data: { name: 'Updated' },
+    })
+    expect(res.status()).toBe(401)
+  })
+})
