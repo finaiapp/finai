@@ -32,12 +32,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Linked bank accounts appear in the dashboard with institution name and account details
   3. Access tokens are encrypted with AES-256-GCM before storage (never plaintext in database)
   4. Link tokens are created on-demand (not cached or pre-generated)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: Database schema and Plaid client setup (plaid_items, plaid_accounts, sync_cursors tables; Plaid SDK singleton; encryption utilities)
-- [ ] 01-02: Plaid Link integration (link token API, token exchange API, usePlaidLink composable)
-- [ ] 01-03: Connected accounts UI (accounts list in dashboard, Connect Bank flow, institution display)
+- [ ] 01-01-PLAN.md — Database schema and Plaid client setup (plaid_items, plaid_accounts, sync_cursors tables; Plaid SDK singleton; encryption utilities)
+- [ ] 01-02-PLAN.md — Plaid Link integration (link token API, token exchange API, usePlaidLink composable)
+- [ ] 01-03-PLAN.md — Connected accounts UI (accounts list in dashboard, Connect Bank flow, institution display)
 
 ### Phase 2: Account Lifecycle
 **Goal**: User has full control over linked accounts including removal and re-authentication
