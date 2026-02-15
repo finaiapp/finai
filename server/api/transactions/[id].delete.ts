@@ -1,0 +1,14 @@
+export default defineEventHandler(async (event) => {
+  const session = await requireUserSession(event)
+  const id = Number(getRouterParam(event, 'id'))
+  if (!id || isNaN(id)) {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid transaction ID' })
+  }
+
+  const deleted = await deleteTransaction(id, session.user.id)
+  if (!deleted) {
+    throw createError({ statusCode: 404, statusMessage: 'Transaction not found' })
+  }
+
+  return { success: true }
+})
