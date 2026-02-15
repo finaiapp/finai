@@ -5,6 +5,38 @@ import { plaidItems, plaidAccounts } from '../database/schema'
 import { encrypt, decrypt } from './encryption'
 
 /**
+ * Get a Plaid item by its Plaid itemId string with ownership check.
+ * Returns the row or null if not found / not owned.
+ */
+export async function getPlaidItemByItemId(itemId: string, userId: number) {
+  const [item] = await db
+    .select({
+      id: plaidItems.id,
+      itemId: plaidItems.itemId,
+      institutionName: plaidItems.institutionName,
+      status: plaidItems.status,
+    })
+    .from(plaidItems)
+    .where(and(eq(plaidItems.itemId, itemId), eq(plaidItems.userId, userId)))
+
+  return item ?? null
+}
+
+/**
+ * Delete a Plaid item by its Plaid itemId string with ownership check.
+ * ON DELETE CASCADE handles plaid_accounts and sync_cursors automatically.
+ * Returns true if a row was deleted, false otherwise.
+ */
+export async function deletePlaidItem(itemId: string, userId: number): Promise<boolean> {
+  const deleted = await db
+    .delete(plaidItems)
+    .where(and(eq(plaidItems.itemId, itemId), eq(plaidItems.userId, userId)))
+    .returning({ id: plaidItems.id })
+
+  return deleted.length > 0
+}
+
+/**
  * Create a new Plaid item record with an encrypted access token.
  */
 export async function createPlaidItem(data: {
