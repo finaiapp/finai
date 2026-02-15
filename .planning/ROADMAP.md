@@ -47,11 +47,11 @@ Plans:
   1. User can disconnect a linked bank account and it disappears from the dashboard
   2. When a bank connection degrades (login required), the user sees a clear banner indicating re-auth is needed
   3. User can re-authenticate a degraded connection via Plaid Link update mode without losing existing data
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Account disconnect flow (API endpoint, UI confirmation, cascading cleanup)
-- [ ] 02-02: Connection health and re-authentication (item health tracking, degraded state detection, Link update mode, UI banners)
+- [ ] 02-01-PLAN.md — Account disconnect flow (DELETE endpoint, DisconnectConfirm modal, AccountsList disconnect buttons, cascade cleanup)
+- [ ] 02-02-PLAN.md — Connection health and re-authentication (status check/update endpoints, link token update mode, openUpdateLink composable, ReauthBanner, lazy status polling)
 
 ### Phase 3: Transaction Sync
 **Goal**: Transactions from linked banks automatically flow into finai via webhooks

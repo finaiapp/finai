@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev --host 0.0.0.0 --port 3889",
+    "dev": "nuxt dev --host 0.0.0.0 --port 3899",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -30,6 +30,7 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@iconify-json/lucide": "^1.2.90",
     "@playwright/test": "^1.58.2",
     "drizzle-kit": "^0.31.9",
     "playwright-core": "^1.58.2"
