@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     const baseConfig = {
       user: { client_user_id: String(session.user.id) },
       client_name: 'finai',
-      country_codes: [CountryCode.Us],
+      country_codes: [CountryCode.No, CountryCode.Nl, CountryCode.Se, CountryCode.Dk, CountryCode.De, CountryCode.Gb, CountryCode.Fr, CountryCode.Es, CountryCode.It],
       language: 'en',
     }
 
