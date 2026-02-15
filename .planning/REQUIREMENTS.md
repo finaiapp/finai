@@ -74,27 +74,27 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ACCT-01 | — | Pending |
-| ACCT-02 | — | Pending |
-| ACCT-03 | — | Pending |
-| ACCT-04 | — | Pending |
-| SYNC-01 | — | Pending |
-| SYNC-02 | — | Pending |
-| SYNC-03 | — | Pending |
-| SYNC-04 | — | Pending |
-| BAL-01 | — | Pending |
-| BAL-02 | — | Pending |
-| BAL-03 | — | Pending |
-| BAL-04 | — | Pending |
-| AI-01 | — | Pending |
-| AI-02 | — | Pending |
-| AI-03 | — | Pending |
+| ACCT-01 | Phase 1: Plaid Foundation | Pending |
+| ACCT-02 | Phase 1: Plaid Foundation | Pending |
+| ACCT-03 | Phase 2: Account Lifecycle | Pending |
+| ACCT-04 | Phase 2: Account Lifecycle | Pending |
+| SYNC-01 | Phase 3: Transaction Sync | Pending |
+| SYNC-02 | Phase 3: Transaction Sync | Pending |
+| SYNC-03 | Phase 3: Transaction Sync | Pending |
+| SYNC-04 | Phase 4: Unified Transaction View | Pending |
+| BAL-01 | Phase 5: Account Balances | Pending |
+| BAL-02 | Phase 5: Account Balances | Pending |
+| BAL-03 | Phase 6: Financial Visualizations | Pending |
+| BAL-04 | Phase 6: Financial Visualizations | Pending |
+| AI-01 | Phase 7: AI Analytics Engine | Pending |
+| AI-02 | Phase 8: Conversational AI | Pending |
+| AI-03 | Phase 8: Conversational AI | Pending |
 
 **Coverage:**
 - v1 requirements: 15 total
-- Mapped to phases: 0
-- Unmapped: 15 ⚠️
+- Mapped to phases: 15
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-15*
-*Last updated: 2026-02-15 after initial definition*
+*Last updated: 2026-02-15 after roadmap creation*
