@@ -1,65 +1,120 @@
 # finai
 
-![finai banner](https://via.placeholder.com/1200x300.png?text=finai+-+Your+Personal+Finance,+Reimagined)
+> Personal Financial Dashboard
 
-> **Your Personal Finance, Reimagined.**
-
-![Nuxt 4](https://img.shields.io/badge/Nuxt-4.3-00DC82?logo=nuxt.js)
-![Vue 3](https://img.shields.io/badge/Vue-3.5-4FC08D?logo=vue.js)
+![Nuxt 4](https://img.shields.io/badge/Nuxt-4-00DC82?logo=nuxt.js)
+![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?logo=vue.js)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Status](https://img.shields.io/badge/status-active-success.svg)
 
-**finai** is a modern, open-source personal financial dashboard designed to give you total control over your money. Leveraging real-time data aggregation and machine learning, finai automates the tedious parts of tracking finances so you can focus on building wealth.
+finai is an open-source personal financial dashboard built with Nuxt 4 and Vue 3. Track spending, plan budgets, and gain insights into your financial health.
 
-## 🚀 Key Features
+## Features
 
-- **⚡ Real-Time Data Aggregation:** Connect to thousands of banks and financial institutions for up-to-the-minute transaction data.
-- **🧠 ML-Powered Categorization:** Smart transaction tagging that learns from your spending habits, eliminating manual spreadsheet work.
-- **📊 Advanced Analytics:** Deep insights into spending patterns, savings trends, and predictive budgeting.
-- **🔒 Privacy-First:** Your data stays with you. We prioritize user privacy and data ownership.
+- Email/password authentication with email verification
+- OAuth login (GitHub, Google)
+- Dashboard with overview, transactions, budgets, and settings
+- Rate limiting and security headers
+- Responsive UI with dark mode support (Nuxt UI)
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Framework:** [Nuxt 4](https://nuxt.com/) (Vue 3)
-- **UI Component Library:** [Nuxt UI](https://ui.nuxt.com/)
+- **UI:** [Nuxt UI v4](https://ui.nuxt.com/)
+- **Database:** PostgreSQL + [Drizzle ORM](https://orm.drizzle.team/)
+- **Auth:** [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils) (sealed cookie sessions)
+- **Email:** [Resend](https://resend.com/)
 - **Runtime:** [Bun](https://bun.sh/)
-- **Language:** [TypeScript](https://www.typescriptlang.org/)
 - **Testing:** [Playwright](https://playwright.dev/)
 
-## 🏁 Getting Started
+## Prerequisites
 
-### Prerequisites
+- [Bun](https://bun.sh/) v1.0+
+- [Docker](https://www.docker.com/) (for PostgreSQL)
 
-- **Node.js** (v18 or higher)
-- **Bun** (v1.0 or higher)
+## Getting Started
 
-### Installation
+### 1. Clone and install
 
-1.  **Clone the repository:**
+```bash
+git clone https://github.com/oliverrees/finai.git
+cd finai
+bun install
+```
 
-    ```bash
-    git clone https://github.com/ollie/finai.git
-    cd finai
-    ```
+### 2. Start PostgreSQL
 
-2.  **Install dependencies:**
+```bash
+docker compose up -d
+```
 
-    ```bash
-    bun install
-    ```
+This starts PostgreSQL 17 on port **5433** (not the default 5432).
 
-3.  **Start the development server:**
+### 3. Configure environment
 
-    ```bash
-    bun run dev
-    ```
+```bash
+cp .env.example .env
+```
 
-    The application will be available at `http://localhost:3889`.
+Edit `.env` and fill in:
 
-## 🤝 Contributing
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | Pre-filled for Docker setup |
+| `NUXT_SESSION_PASSWORD` | Yes | Random 32+ char string for cookie encryption |
+| `NUXT_OAUTH_GITHUB_CLIENT_ID` | No | GitHub OAuth app client ID |
+| `NUXT_OAUTH_GITHUB_CLIENT_SECRET` | No | GitHub OAuth app client secret |
+| `NUXT_OAUTH_GOOGLE_CLIENT_ID` | No | Google OAuth client ID |
+| `NUXT_OAUTH_GOOGLE_CLIENT_SECRET` | No | Google OAuth client secret |
+| `RESEND_API_KEY` | No | Resend API key for verification emails |
+| `EMAIL_FROM` | No | Sender email address |
+| `APP_URL` | Yes | Pre-filled as `http://localhost:3889` |
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to get started.
+### 4. Run database migrations
 
-## 📄 License
+```bash
+bun run db:generate
+bun run db:migrate
+```
 
-This project is licensed under the [MIT License](LICENSE).
+### 5. Start the dev server
+
+```bash
+bun run dev
+```
+
+The app will be available at [http://localhost:3889](http://localhost:3889).
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `bun run dev` | Start dev server (port 3889) |
+| `bun run build` | Build for production |
+| `bun run preview` | Preview production build |
+| `bun run test:e2e` | Run Playwright E2E tests |
+| `bun run test:e2e:ui` | Run tests in Playwright UI mode |
+| `bun run db:generate` | Generate Drizzle migrations |
+| `bun run db:migrate` | Apply database migrations |
+| `bun run db:studio` | Open Drizzle Studio |
+
+## Project Structure
+
+```
+app/                  # Nuxt 4 source directory
+  pages/              # File-based routing
+  components/         # Auto-imported Vue components
+  composables/        # Auto-imported composables
+  layouts/            # Layout components (default, dashboard)
+  middleware/         # Route middleware (auth, guest)
+server/               # Nitro server
+  api/auth/           # Auth API endpoints
+  routes/auth/        # OAuth handlers (GitHub, Google)
+  database/           # Drizzle schema and migrations
+  middleware/         # Server middleware (security headers)
+  utils/              # Server utilities (auth, email, rate-limit, validation)
+tests/                # Playwright E2E tests
+```
+
+## License
+
+[MIT](LICENSE)
