@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-15)
 
 **Core value:** Real bank data flowing into an AI-powered dashboard that helps me understand and control my money
-**Current focus:** Phase 1 — Plaid Foundation
+**Current focus:** Phase 2 — Account Lifecycle
 
 ## Current Position
 
-Phase: 1 of 8 (Plaid Foundation)
-Plan: 2 of 3 in current phase
+Phase: 2 of 8 (Account Lifecycle)
+Plan: 1 of 2 in current phase
 Status: Executing
-Last activity: 2026-02-15 — Completed 01-02 (Plaid Link Integration)
+Last activity: 2026-02-15 — Completed 02-01 (Account Disconnect)
 
-Progress: [▓▓░░░░░░░░] 10%
+Progress: [▓▓▓░░░░░░░] 15%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 3
 - Average duration: 2 min
-- Total execution time: 0.07 hours
+- Total execution time: 0.10 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-plaid-foundation | 2/3 | 4 min | 2 min |
+| 02-account-lifecycle | 1/2 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2 min), 01-02 (2 min)
+- Last 5 plans: 01-01 (2 min), 01-02 (2 min), 02-01 (2 min)
 - Trend: Consistent
 
 *Updated after each plan completion*
@@ -50,6 +51,8 @@ Recent decisions affecting current work:
 - [01-01]: getUserPlaidItems excludes encrypted token from results for defense-in-depth
 - [01-02]: Pass raw token to createPlaidItem (encrypts internally) to avoid double encryption
 - [01-02]: Plaid Link CDN plugin provides ready promise; composable awaits before using window.Plaid
+- [02-01]: Handle 400 from Plaid itemRemove as already-invalid token, proceed with local cleanup
+- [02-01]: Expose Plaid itemId (not DB id) in getUserPlaidAccounts for client-side disconnect API calls
 
 ### Pending Todos
 
@@ -64,5 +67,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed 01-02-PLAN.md (Plaid Link Integration)
+Stopped at: Completed 02-01-PLAN.md (Account Disconnect)
 Resume file: None
