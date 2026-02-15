@@ -1,4 +1,4 @@
-// Keep in sync with app/utils/validation.ts
+// Keep in sync with server/utils/validation.ts
 export function validateEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email) && email.length <= 255
@@ -18,8 +18,4 @@ export function validatePassword(password: string): { valid: boolean; message?: 
     return { valid: false, message: 'Password must contain at least one digit' }
   }
   return { valid: true }
-}
-
-export function sanitizeName(name: string): string {
-  return name.trim().slice(0, 100)
 }
