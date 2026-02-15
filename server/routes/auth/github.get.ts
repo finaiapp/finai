@@ -6,10 +6,14 @@ export default defineOAuthGitHubEventHandler({
   async onSuccess(event, { user: ghUser }) {
     const user = await upsertOAuthUser('github', {
       id: String(ghUser.id),
-      email: ghUser.email,
+      email: ghUser.email as string,
       name: ghUser.name || ghUser.login,
       avatarUrl: ghUser.avatar_url,
     })
+
+    if (!user) {
+      throw createError({ statusCode: 500, statusMessage: 'Failed to create or update user' })
+    }
 
     await setUserSession(event, {
       user: {

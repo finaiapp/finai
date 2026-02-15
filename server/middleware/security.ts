@@ -8,10 +8,11 @@ export default defineEventHandler((event) => {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
   })
 
-  // Remove X-Powered-By after Nitro sets it by hooking into the response write
-  const originalWriteHead = event.node.res.writeHead
-  event.node.res.writeHead = function (...args: Parameters<typeof originalWriteHead>) {
-    this.removeHeader('X-Powered-By')
-    return originalWriteHead.apply(this, args)
-  }
+  // Remove X-Powered-By after Nitro sets it
+  const res = event.node.res
+  const originalWriteHead = res.writeHead.bind(res)
+  res.writeHead = ((...args: Parameters<typeof res.writeHead>) => {
+    res.removeHeader('X-Powered-By')
+    return (originalWriteHead as Function)(...args)
+  }) as typeof res.writeHead
 })

@@ -53,8 +53,8 @@ function validate(s: typeof state): FormError[] {
   const result = validateTransactionForm({
     type: s.type,
     amount: s.amount,
-    description: s.description,
-    date: s.date,
+    description: s.description ?? '',
+    date: s.date ?? '',
   })
   return result.map(e => ({ name: e.field, message: e.message }))
 }
@@ -65,9 +65,9 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
   try {
     emit('submit', {
       type: event.data.type as 'income' | 'expense',
-      amount: event.data.amount,
-      description: event.data.description,
-      date: event.data.date,
+      amount: String(event.data.amount),
+      description: String(event.data.description),
+      date: String(event.data.date),
       categoryId: event.data.categoryId || undefined,
       notes: event.data.notes || undefined,
     })

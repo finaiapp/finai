@@ -10,6 +10,10 @@ export default defineOAuthGoogleEventHandler({
       avatarUrl: googleUser.picture,
     })
 
+    if (!user) {
+      throw createError({ statusCode: 500, statusMessage: 'Failed to create or update user' })
+    }
+
     await setUserSession(event, {
       user: {
         id: user.id,

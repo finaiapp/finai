@@ -6,7 +6,9 @@ interface Transaction {
   description: string
   date: string
   notes: string | null
+  categoryId: number | null
   category: { id: number; name: string; icon: string | null; color: string | null } | null
+  createdAt: string
 }
 
 defineProps<{

@@ -30,8 +30,8 @@ export default defineEventHandler(async (event) => {
     passwordHash,
   })
 
-  const token = await createVerificationToken(user.id, 'email_verify')
-  await sendVerificationEmail(user.email, token)
+  const token = await createVerificationToken(user!.id, 'email_verify')
+  await sendVerificationEmail(user!.email, token)
 
   setResponseStatus(event, 201)
   return { message: 'Registration successful. Please check your email to verify your account.' }

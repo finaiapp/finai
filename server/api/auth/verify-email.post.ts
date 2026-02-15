@@ -18,20 +18,24 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Invalid or expired verification token' })
   }
 
-  const [user] = await db
+  const [updatedUser] = await db
     .update(users)
     .set({ emailVerified: true })
     .where(eq(users.id, verified.userId))
     .returning()
 
+  if (!updatedUser) {
+    throw createError({ statusCode: 404, statusMessage: 'User not found' })
+  }
+
   await setUserSession(event, {
     user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      avatarUrl: user.avatarUrl,
-      emailVerified: user.emailVerified,
-      provider: user.provider,
+      id: updatedUser.id,
+      email: updatedUser.email,
+      name: updatedUser.name,
+      avatarUrl: updatedUser.avatarUrl,
+      emailVerified: updatedUser.emailVerified,
+      provider: updatedUser.provider,
     },
     loggedInAt: Date.now(),
   })

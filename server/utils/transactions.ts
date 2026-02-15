@@ -27,10 +27,11 @@ export async function getUserTransactions(userId: number, filters: TransactionFi
     offset: filters.offset ?? 0,
   })
 
-  const [{ total }] = await db
+  const [countResult] = await db
     .select({ total: count() })
     .from(transactions)
     .where(and(...conditions))
+  const total = countResult?.total ?? 0
 
   return { items, total }
 }
@@ -124,7 +125,7 @@ export async function getDashboardSummary(userId: number) {
     ))
 
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-    .toISOString().split('T')[0]
+    .toISOString().split('T')[0]!
   const [recentResult] = await db
     .select({ recentCount: count() })
     .from(transactions)
@@ -133,12 +134,12 @@ export async function getDashboardSummary(userId: number) {
       gte(transactions.date, thirtyDaysAgo),
     ))
 
-  const totalIncome = parseFloat(balanceResult.totalIncome)
-  const totalExpenses = parseFloat(balanceResult.totalExpenses)
+  const totalIncome = parseFloat(balanceResult?.totalIncome ?? '0')
+  const totalExpenses = parseFloat(balanceResult?.totalExpenses ?? '0')
 
   return {
     totalBalance: (totalIncome - totalExpenses).toFixed(2),
-    monthlySpending: parseFloat(monthlyResult.monthlySpending).toFixed(2),
-    recentTransactionCount: recentResult.recentCount,
+    monthlySpending: parseFloat(monthlyResult?.monthlySpending ?? '0').toFixed(2),
+    recentTransactionCount: recentResult?.recentCount ?? 0,
   }
 }
