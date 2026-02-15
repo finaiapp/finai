@@ -98,6 +98,20 @@ export async function getPlaidItemAccessToken(itemId: string, userId: number): P
 }
 
 /**
+ * Update the status field on a Plaid item with ownership check.
+ * Returns true if a row was updated, false otherwise.
+ */
+export async function updatePlaidItemStatus(itemId: string, userId: number, status: string): Promise<boolean> {
+  const updated = await db
+    .update(plaidItems)
+    .set({ status })
+    .where(and(eq(plaidItems.itemId, itemId), eq(plaidItems.userId, userId)))
+    .returning({ id: plaidItems.id })
+
+  return updated.length > 0
+}
+
+/**
  * Get all Plaid accounts for a user, joined with institution info.
  */
 export async function getUserPlaidAccounts(userId: number) {
@@ -116,6 +130,7 @@ export async function getUserPlaidAccounts(userId: number) {
       institutionId: plaidItems.institutionId,
       institutionName: plaidItems.institutionName,
       itemId: plaidItems.itemId,
+      itemStatus: plaidItems.status,
       plaidItemId: plaidAccounts.plaidItemId,
       createdAt: plaidAccounts.createdAt,
       updatedAt: plaidAccounts.updatedAt,
