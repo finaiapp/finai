@@ -9,6 +9,11 @@ const items: NavigationMenuItem[][] = [
       to: '/dashboard',
     },
     {
+      label: 'Accounts',
+      icon: 'i-lucide-landmark',
+      to: '/dashboard/accounts',
+    },
+    {
       label: 'Transactions',
       icon: 'i-lucide-arrow-left-right',
       to: '/dashboard/transactions',

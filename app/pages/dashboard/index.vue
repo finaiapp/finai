@@ -13,10 +13,17 @@ const { transactions, error: txError, fetchTransactions } = useTransactions()
 
 const pageError = computed(() => summaryError.value || txError.value)
 
+const plaidAccounts = ref<unknown[]>([])
+
 onMounted(async () => {
   await Promise.all([
     fetchSummary(),
     fetchTransactions({ limit: 5 }),
+    $fetch<unknown[]>('/api/plaid/accounts').then((data) => {
+      plaidAccounts.value = data
+    }).catch(() => {
+      // Non-critical — don't block dashboard
+    }),
   ])
 })
 
@@ -37,9 +44,9 @@ const cards = computed(() => [
     value: summary.value ? String(summary.value.recentTransactionCount) : '0',
   },
   {
-    icon: 'i-lucide-pie-chart',
-    label: 'Budget Status',
-    value: 'No budgets',
+    icon: 'i-lucide-landmark',
+    label: 'Connected Accounts',
+    value: plaidAccounts.value.length > 0 ? `${plaidAccounts.value.length} accounts` : 'Not connected',
   },
 ])
 </script>
