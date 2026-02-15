@@ -6,6 +6,10 @@ export default defineEventHandler((event) => {
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   })
 
-  // Remove X-Powered-By if present
-  removeResponseHeader(event, 'X-Powered-By')
+  // Remove X-Powered-By after Nitro sets it by hooking into the response write
+  const originalWriteHead = event.node.res.writeHead
+  event.node.res.writeHead = function (...args: Parameters<typeof originalWriteHead>) {
+    this.removeHeader('X-Powered-By')
+    return originalWriteHead.apply(this, args)
+  }
 })
