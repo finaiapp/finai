@@ -47,4 +47,12 @@ test.describe('Security Headers', () => {
     const res = await page.request.get('/')
     expect(res.headers()['strict-transport-security']).toBe('max-age=31536000; includeSubDomains')
   })
+
+  test('CSP and HSTS headers present on API routes', async ({ page }) => {
+    const res = await page.request.post('/api/auth/login', {
+      data: { email: 'test@test.com', password: 'test' },
+    })
+    expect(res.headers()['content-security-policy']).toBeDefined()
+    expect(res.headers()['strict-transport-security']).toBeDefined()
+  })
 })
