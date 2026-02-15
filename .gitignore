@@ -26,3 +26,6 @@ logs
 # Playwright
 playwright-report/
 test-results/
+WORKFLOW.md
+.plans/notion-audit-fixes.md
+BASIC_AUTH_PLAN.md

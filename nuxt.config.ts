@@ -7,6 +7,23 @@ export default defineNuxtConfig({
     '@nuxt/test-utils',
     '@nuxt/ui',
     '@nuxtjs/ngrok',
-    '@oro.ad/nuxt-claude-devtools'
-  ]
+    '@oro.ad/nuxt-claude-devtools',
+    'nuxt-auth-utils',
+  ],
+
+  runtimeConfig: {
+    session: {
+      maxAge: 604800,
+    },
+    oauth: {
+      github: {
+        clientId: '',
+        clientSecret: '',
+      },
+      google: {
+        clientId: '',
+        clientSecret: '',
+      },
+    },
+  },
 })

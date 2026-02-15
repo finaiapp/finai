@@ -16,12 +16,18 @@
     "@nuxt/ui": "4.4.0",
     "@nuxtjs/ngrok": "3.0.1",
     "@oro.ad/nuxt-claude-devtools": "1.5.2",
+    "drizzle-orm": "^0.45.1",
     "nuxt": "^4.3.1",
+    "nuxt-auth-utils": "^0.5.28",
+    "postgres": "^3.4.8",
+    "rate-limiter-flexible": "^9.1.1",
+    "resend": "^6.9.2",
     "vue": "^3.5.28",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
+    "drizzle-kit": "^0.31.9",
     "playwright-core": "^1.58.2"
   }
 }
