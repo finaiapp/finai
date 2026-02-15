@@ -17,4 +17,14 @@ test.describe('Transactions Pages - Auth Redirect', () => {
     await goto('/dashboard', { waitUntil: 'hydration' })
     await expect(page).toHaveURL(/\/login$/)
   })
+
+  test('/dashboard/budgets redirects to login', async ({ page, goto }) => {
+    await goto('/dashboard/budgets', { waitUntil: 'hydration' })
+    await expect(page).toHaveURL(/\/login/)
+  })
+
+  test('/dashboard/settings redirects to login', async ({ page, goto }) => {
+    await goto('/dashboard/settings', { waitUntil: 'hydration' })
+    await expect(page).toHaveURL(/\/login/)
+  })
 })
