@@ -2,6 +2,7 @@ const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/
 
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
+  await checkRateLimit(apiRateLimiter, getRequestIP(event, { xForwardedFor: true }) || 'unknown')
   const query = getQuery(event)
 
   // Validate type filter

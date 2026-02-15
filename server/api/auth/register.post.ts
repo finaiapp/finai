@@ -1,4 +1,5 @@
 export default defineEventHandler(async (event) => {
+  await checkRateLimit(authRateLimiter, getRequestIP(event, { xForwardedFor: true }) || 'unknown')
   const body = await readBody(event)
   const { email, password, name } = body || {}
 

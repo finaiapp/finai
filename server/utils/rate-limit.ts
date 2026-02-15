@@ -18,6 +18,12 @@ export const verificationRateLimiter = new RateLimiterMemory({
   keyPrefix: 'verification_ip',
 })
 
+export const apiRateLimiter = new RateLimiterMemory({
+  points: 60,
+  duration: 60, // 60 requests per minute per IP
+  keyPrefix: 'api_ip',
+})
+
 export async function checkRateLimit(
   limiter: RateLimiterMemory,
   key: string,

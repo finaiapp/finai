@@ -1,5 +1,6 @@
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
+  await checkRateLimit(apiRateLimiter, getRequestIP(event, { xForwardedFor: true }) || 'unknown')
   const id = Number(getRouterParam(event, 'id'))
   if (!id || isNaN(id)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid category ID' })
