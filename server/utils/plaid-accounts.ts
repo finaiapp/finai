@@ -115,6 +115,7 @@ export async function getUserPlaidAccounts(userId: number) {
       isoCurrencyCode: plaidAccounts.isoCurrencyCode,
       institutionId: plaidItems.institutionId,
       institutionName: plaidItems.institutionName,
+      itemId: plaidItems.itemId,
       plaidItemId: plaidAccounts.plaidItemId,
       createdAt: plaidAccounts.createdAt,
       updatedAt: plaidAccounts.updatedAt,

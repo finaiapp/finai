@@ -12,6 +12,7 @@ interface PlaidAccount {
   isoCurrencyCode: string | null
   institutionId: string | null
   institutionName: string | null
+  itemId: string
   plaidItemId: number
   createdAt: string
   updatedAt: string
@@ -19,12 +20,18 @@ interface PlaidAccount {
 
 interface InstitutionGroup {
   name: string
+  itemId: string
   accounts: PlaidAccount[]
 }
 
 const accounts = ref<PlaidAccount[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
+
+// Disconnect state
+const disconnectingItemId = ref<string | null>(null)
+const disconnectInstitutionName = ref('')
+const disconnectLoading = ref(false)
 
 async function fetchAccounts() {
   loading.value = true
@@ -47,19 +54,43 @@ async function refresh() {
 defineExpose({ refresh })
 
 const groupedAccounts = computed<InstitutionGroup[]>(() => {
-  const groups = new Map<string, PlaidAccount[]>()
+  const groups = new Map<string, { itemId: string; accounts: PlaidAccount[] }>()
   for (const account of accounts.value) {
     const key = account.institutionName || 'Unknown Institution'
     if (!groups.has(key)) {
-      groups.set(key, [])
+      groups.set(key, { itemId: account.itemId, accounts: [] })
     }
-    groups.get(key)!.push(account)
+    groups.get(key)!.accounts.push(account)
   }
-  return Array.from(groups.entries()).map(([name, accts]) => ({
+  return Array.from(groups.entries()).map(([name, group]) => ({
     name,
-    accounts: accts,
+    itemId: group.itemId,
+    accounts: group.accounts,
   }))
 })
+
+function openDisconnect(group: InstitutionGroup) {
+  disconnectingItemId.value = group.itemId
+  disconnectInstitutionName.value = group.name
+}
+
+async function handleDisconnect() {
+  if (!disconnectingItemId.value) return
+
+  disconnectLoading.value = true
+  error.value = null
+  try {
+    await $fetch(`/api/plaid/items/${disconnectingItemId.value}`, { method: 'DELETE' })
+    disconnectingItemId.value = null
+    await fetchAccounts()
+  }
+  catch (err: unknown) {
+    error.value = handleApiError(err)
+  }
+  finally {
+    disconnectLoading.value = false
+  }
+}
 
 function badgeColor(type: string): 'success' | 'info' | 'warning' | 'neutral' {
   switch (type) {
@@ -104,9 +135,19 @@ onMounted(() => {
     <div v-else class="space-y-6">
       <UCard v-for="group in groupedAccounts" :key="group.name">
         <template #header>
-          <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-building-2" class="w-5 h-5 text-gray-500" />
-            <span class="font-semibold text-gray-900 dark:text-white">{{ group.name }}</span>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-building-2" class="w-5 h-5 text-gray-500" />
+              <span class="font-semibold text-gray-900 dark:text-white">{{ group.name }}</span>
+            </div>
+            <UButton
+              variant="ghost"
+              color="error"
+              size="xs"
+              icon="i-lucide-unplug"
+              label="Disconnect"
+              @click="openDisconnect(group)"
+            />
           </div>
         </template>
 
@@ -146,5 +187,13 @@ onMounted(() => {
         </div>
       </UCard>
     </div>
+
+    <PlaidDisconnectConfirm
+      :open="disconnectingItemId !== null"
+      :institution-name="disconnectInstitutionName"
+      :loading="disconnectLoading"
+      @cancel="disconnectingItemId = null"
+      @confirm="handleDisconnect"
+    />
   </div>
 </template>
